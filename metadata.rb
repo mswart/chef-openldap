@@ -16,8 +16,12 @@ recipe            "openldap::master", "use on nodes that should be a slapd maste
   supports os
 end
 
-%w{ openssh nscd openssl }.each do |cb|
+%w{ openssl }.each do |cb|
   depends cb
+end
+
+%w{ openssh nscd }.each do |cb|
+  suggests cb
 end
 
 attribute "openldap/basedn",
