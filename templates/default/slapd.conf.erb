@@ -12,10 +12,13 @@ TLSCertificateFile     <%= node['openldap']['dir'] %>/ssl/<%= node['openldap']['
 TLSCertificateKeyFile  <%= node['openldap']['dir'] %>/ssl/<%= node['openldap']['server'] %>.pem
 
 # Schema and objectClass definitions
-include         <%= node['openldap']['dir'] %>/schema/core.schema
-include         <%= node['openldap']['dir'] %>/schema/cosine.schema
-include         <%= node['openldap']['dir'] %>/schema/nis.schema
-include         <%= node['openldap']['dir'] %>/schema/inetorgperson.schema
+<% node['openldap']['schema'].each do |schema| -%>
+<% if schema[0] == '/' %>
+include         <%= schema %>
+<% else %>
+include         <%= node['openldap']['dir'] %>/schema/<%= schema %>.schema
+<% end %>
+<% end -%>
 
 # Where the pid file is put. The init.d script
 # will not stop the server if you change this.
@@ -25,23 +28,25 @@ pidfile         <%= node['openldap']['run_dir'] %>/slapd.pid
 argsfile        <%= node['openldap']['run_dir'] %>/slapd.args
 
 # Read slapd.conf(5) for possible values
-loglevel        0
+loglevel        <%= node['openldap']['loglevel'] %>
 
 <% unless node['platform'] == "centos" -%>
 # Where the dynamically loaded modules are stored
 modulepath	<%= node['openldap']['module_dir'] %>
-moduleload	back_hdb
 <% if node['openldap']['slapd_type'] == "master" -%>
 moduleload  syncprov
+<% end -%>
+<% node['openldap']['modules'].each do |modulename| -%>
+moduleload  <%= modulename %>
 <% end -%>
 <% end -%>
 
 # The maximum number of entries that is returned for a search operation
-sizelimit 500
+sizelimit <%= node['openldap']['sizelimit'] %>
 
 # The tool-threads parameter sets the actual amount of cpu's that is used
 # for indexing.
-tool-threads 1
+tool-threads <%= node['openldap']['tool-threads'] %>
 
 #######################################################################
 # Specific Backend Directives for hdb:
