@@ -36,7 +36,6 @@ modulepath	<%= node['openldap']['module_dir'] %>
 <% if node['openldap']['slapd_type'] == "master" -%>
 moduleload  syncprov
 <% end -%>
-<% node['openldap']['modules'].each do |modulename| -%>
 <% node['openldap']['slapd_modules'].each do |modulename| -%>
 moduleload  <%= modulename %>
 <% end -%>
