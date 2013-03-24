@@ -20,11 +20,11 @@
 class Chef::Node
   def generate_openldap_acls_from_attributes
     self['openldap']['slapd_acls'].sort.inject([]) do |acl, (priority, aclMesh)|
-      next acl if aclMesh.nil? # skipping because entry was removed
+      next acl if aclMesh.nil? or aclMesh == '' # skipping because entry was removed
       # build what string
       what = [ 'to' ]
       unless aclMesh['dn'].nil?
-        what << unless aclMesh['dntype'].nil?
+        what << if aclMesh['dntype'].nil?
           "dn=\"#{aclMesh['dn']}\""
         else
           "dn.#{aclMesh['dntype']}=\"#{aclMesh['dn']}\""
