@@ -7,9 +7,11 @@
 # $Id:$
 ####
 
+<% if node['openldap']['tls'] == "true" -%>
 # TLS configuration
 TLSCertificateFile     <%= node['openldap']['dir'] %>/ssl/<%= node['openldap']['server'] %>.pem
 TLSCertificateKeyFile  <%= node['openldap']['dir'] %>/ssl/<%= node['openldap']['server'] %>.pem
+<% end -%>
 
 # Schema and objectClass definitions
 <% node['openldap']['slapd_schema'].each do |schema| -%>
