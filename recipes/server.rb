@@ -62,7 +62,25 @@ if (node['platform'] == "ubuntu")
     group "root"
     mode 00644
   end
-
+  
+  if (node['openldap']['slapd_schema'].include?('samba'))
+    package "samba-doc" do
+      action :upgrade
+    end
+    
+    execute "samba-schema-copy" do
+      command "cp /usr/share/doc/samba-doc/examples/LDAP/samba.schema.gz #{node['openldap']['dir']}/schema/samba.schema.gz"
+      creates "#{node['openldap']['dir']}/schema/samba.schema.gz"
+      action :run
+    end
+    
+    execute "samba-schema-extract" do
+       command "gunzip -c #{node['openldap']['dir']}/schema/samba.schema.gz > #{node['openldap']['dir']}/schema/samba.schema"
+       creates "#{node['openldap']['dir']}/schema/samba.schema"
+       action :run
+     end
+  end
+  
   directory "#{node['openldap']['dir']}/slapd.d" do
     recursive true
     owner "openldap"
