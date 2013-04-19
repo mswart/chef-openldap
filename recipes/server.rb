@@ -72,7 +72,13 @@ if (node['platform'] == "ubuntu")
       command "cp /usr/share/doc/samba-doc/examples/LDAP/samba.schema.gz #{node['openldap']['dir']}/schema/samba.schema.gz && gunzip #{node['openldap']['dir']}/schema/samba.schema.gz"
       creates "#{node['openldap']['dir']}/schema/samba.schema"
       action :run
-    end    
+    end
+    
+    execute "samba-schema-ldif" do
+      command "cp /usr/share/doc/samba-doc/examples/LDAP/samba.ldif.gz #{node['openldap']['dir']}/schema/samba.ldif.gz && gunzip #{node['openldap']['dir']}/schema/samba.ldif.gz"
+      creates "#{node['openldap']['dir']}/schema/samba.ldif"
+      action :run
+    end
   end
   
   directory "#{node['openldap']['dir']}/slapd.d" do
