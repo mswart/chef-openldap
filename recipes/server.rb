@@ -42,11 +42,13 @@ else
   end
 end
 
-cookbook_file "#{node['openldap']['ssl_dir']}/#{node['openldap']['server']}.pem" do
-  source "ssl/#{node['openldap']['server']}.pem"
-  mode 00644
-  owner "root"
-  group "root"
+if node['tls'] == true
+  cookbook_file "#{node['openldap']['ssl_dir']}/#{node['openldap']['server']}.pem" do
+    source "ssl/#{node['openldap']['server']}.pem"
+    mode 00644
+    owner "root"
+    group "root"
+  end
 end
 
 service "slapd" do
@@ -60,7 +62,25 @@ if (node['platform'] == "ubuntu")
     group "root"
     mode 00644
   end
-
+  
+  if (node['openldap']['slapd_schema'].include?('samba'))
+    package "samba-doc" do
+      action :upgrade
+    end
+    
+    execute "samba-schema" do
+      command "cp /usr/share/doc/samba-doc/examples/LDAP/samba.schema.gz #{node['openldap']['dir']}/schema/samba.schema.gz && gunzip #{node['openldap']['dir']}/schema/samba.schema.gz"
+      creates "#{node['openldap']['dir']}/schema/samba.schema"
+      action :run
+    end
+    
+    execute "samba-schema-ldif" do
+      command "cp /usr/share/doc/samba-doc/examples/LDAP/samba.ldif.gz #{node['openldap']['dir']}/schema/samba.ldif.gz && gunzip #{node['openldap']['dir']}/schema/samba.ldif.gz"
+      creates "#{node['openldap']['dir']}/schema/samba.ldif"
+      action :run
+    end
+  end
+  
   directory "#{node['openldap']['dir']}/slapd.d" do
     recursive true
     owner "openldap"
