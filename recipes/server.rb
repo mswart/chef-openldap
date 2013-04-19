@@ -68,17 +68,11 @@ if (node['platform'] == "ubuntu")
       action :upgrade
     end
     
-    execute "samba-schema-copy" do
-      command "cp /usr/share/doc/samba-doc/examples/LDAP/samba.schema.gz #{node['openldap']['dir']}/schema/samba.schema.gz"
-      creates "#{node['openldap']['dir']}/schema/samba.schema.gz"
+    execute "samba-schema" do
+      command "cp /usr/share/doc/samba-doc/examples/LDAP/samba.schema.gz #{node['openldap']['dir']}/schema/samba.schema.gz && gunzip #{node['openldap']['dir']}/schema/samba.schema.gz"
+      creates "#{node['openldap']['dir']}/schema/samba.schema"
       action :run
-    end
-    
-    execute "samba-schema-extract" do
-       command "gunzip -c #{node['openldap']['dir']}/schema/samba.schema.gz > #{node['openldap']['dir']}/schema/samba.schema"
-       creates "#{node['openldap']['dir']}/schema/samba.schema"
-       action :run
-     end
+    end    
   end
   
   directory "#{node['openldap']['dir']}/slapd.d" do
